@@ -10,16 +10,18 @@ class LanguageController extends Controller
 {
     public function setLanguage(Request $request)
     {
-    
+        $this->validate($request, [
+            'language' => 'required|in:en,bn', // You can add more language codes if needed
+        ]);
+
+
+
         $language = $request->input('language');
-    
-        // Store the selected language in the session
-        Session::put('preferred_language', $language);
-        
-        // Set the preferred language
+        dd($language);
+
         App::setLocale($language);
-    
-        // Redirect back to the previous page or any desired route
+
+
         return redirect()->back();
     }
 }

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Company')
+@section('title', 'employee')
 
 @push('css')
 @endpush
@@ -13,16 +13,16 @@
                     <i class="pe-7s-check icon-gradient bg-mean-fruit">
                     </i>
                 </div>
-                <div>{{ __('all_companies') }}</div>
+                <div>{{ __('all_employees') }}</div>
 
             </div>
             <div class="page-title-actions">
                 <div class="d-inline-block dropdown">
-                    <a href="{{ route('companies.create') }}" class="btn-shadow btn btn-info">
+                    <a href="{{ route('employees.create') }}" class="btn-shadow btn btn-info">
                         <span class="btn-icon-wrapper pr-2 opacity-7">
                             <i class="fas fa-plus-circle fa-w-20"></i>
                         </span>
-                        {{ __('create_company') }}
+                        {{ __('create_employee') }}
                     </a>
 
                 </div>
@@ -35,12 +35,13 @@
                 <div class="table-responsive">
                     <table id="dataTable" class="align-middle mb-0 table table-borderless table-striped table-hover">
                         <thead>
-
                             <tr>
                                 <th>#</th>
-                                <th>{{ __('name') }}</th>
+                                <th>{{ __('first_name') }}</th>
+                                <th>{{ __('last_name') }}</th>
                                 <th>{{ __('email') }}</th>
-                                <th>{{ __('logo') }}</th>
+                                <th>{{ __('phone') }}</th>
+                                <th>{{ __('company') }}</th>
                                 <th>{{ __('actions') }}</th>
                             </tr>
                         </thead>
@@ -48,6 +49,7 @@
 
                         </tbody>
                     </table>
+
                 </div>
             </div>
         </div>
@@ -65,11 +67,12 @@
                 "paging": true,
                 "iDisplayLength": 20,
                 "ajax": {
-                    "url": "{{ route('companies.index') }}",
+                    "url": "{{ route('employees.index') }}",
                     "data": function(data) {
                         // Additional data to be sent with the request
                         // Example: data.status = $("#status").val();
-                    }
+                    },
+
                 },
                 "columns": [{
                         "data": "DT_RowIndex",
@@ -78,34 +81,28 @@
                         "searchable": false
                     },
                     {
-                        "data": "name",
-                        "name": "name"
+                        "data": "first_name",
+                        "name": "first_name"
+                    },
+                    {
+                        "data": "last_name",
+                        "name": "last_name"
                     },
                     {
                         "data": "email",
                         "name": "email"
                     },
                     {
-                        "data": "logo",
-                        "name": "logo",
+                        "data": "phone",
+                        "name": "phone"
+                    },
+                    {
+                        "data": "company.name", // Use the correct data path for company name
+                        "name": "company.name",
                         "render": function(data, type, row) {
-                            if (data) {
-                                var imageUrl = '{{ asset('/storage') }}' + '/' + data;
-                                return '<img src="' + imageUrl +
-                                    '" alt="Company Logo" class="logo-image">';
-                            } else {
-                                var defaultImageUrl = '{{ asset('assets/images/no_img.jpg') }}';
-                                return '<img src="' + defaultImageUrl +
-                                    '" alt="Default Company Logo" class="logo-image">';
-                            }
+                            return row.company.name ? row.company.name : '';
                         }
                     },
-
-
-
-
-
-
                     {
                         "data": "action",
                         "name": "action",
@@ -123,19 +120,25 @@
 
 
 
+
+
     <script>
-        function deleteCompany(event) {
+        function deleteEmployee(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Display confirmation dialog
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
+                // If user confirms the deletion
                 if (result.isConfirmed) {
-                    event.target.submit();
+                    event.target.submit(); // Proceed with form submission
                 }
             });
         }

@@ -9,6 +9,18 @@ return [
     'dashboard' => 'ড্যাশবোর্ড',
     'company' => 'কোম্পানি',
     'all_companies' => 'সমস্ত কোম্পানি',
-    
+    'all_employees' => 'সমস্ত কর্মচারীগণ',
+    'create_employee' => 'কর্মচারী তৈরি করুন',
+    'employee' => 'কর্মচারী',
+    'first_name' => 'নামের প্রথম অংশ',
+    'last_name' => 'নামের শেষ অংশ',
+    'select_company' => '-- কোম্পানি নির্বাচন করুন --',
+    'email' => 'ইমেইল',
+    'phone' => 'ফোন',
+    'reset' => 'রিসেট',
+    'update' => 'আপডেট',
+    'create' => 'তৈরি করুন',
+    'user' => 'ব্যবহারকারী',
+    'maximum_logo_size' => 'সর্বোচ্চ সাইজঃ ১০০x১০০ পিক্সেল।',
 
 ];

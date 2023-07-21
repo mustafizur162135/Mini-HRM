@@ -24,7 +24,16 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" rel="stylesheet">
     {{-- datatable css --}}
     <link href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css" rel="stylesheet">
-  
+
+    <!-- SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
+
+    <!-- SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.js"></script>
+
+    <link href="{{ asset('css/iziToast.css') }}" rel="stylesheet">
+
+
     @stack('css')
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -49,15 +58,22 @@
     </div>
     <script type="text/javascript" src="{{ asset('js/scripts/main.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="{{ asset('js/iziToast.js') }}"></script>
+    @include('vendor.lara-izitoast.toast')
     {{-- datatable js --}}
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        var url = "{{ route('lang.change') }}";
 
+        $('.lang-change').change(function() {
+            let lang_code = $(this).val();
+            window.location.href = url + '/' + lang_code;
+        });
+    </script>
 
     @stack('js')
 
-    {{-- <script>
-        let table = new DataTable('#dataTable');
-    </script> --}}
+
 </body>
 
 </html>

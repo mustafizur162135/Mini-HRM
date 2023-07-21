@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
+use App\Mail\NewCompanyNotification;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use DataTables;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-
-
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
+use Exception;
 
 
 class CompanyController extends Controller
@@ -31,12 +33,14 @@ class CompanyController extends Controller
 
                     $btn = '<a href="' . $editUrl . '" class="edit btn btn-primary btn-sm">Edit</a>';
                     $btn .= '
-                        <form action="' . $deleteUrl . '" method="POST" class="d-inline">
-                            ' . csrf_field() . '
-                            ' . method_field('DELETE') . '
-                            <button type="submit" class="delete btn btn-danger btn-sm">Delete</button>
-                        </form>
-                    ';
+                    <form action="' . $deleteUrl . '" method="POST" class="d-inline" onsubmit="event.preventDefault(); deleteCompany(event)">
+                        ' . csrf_field() . '
+                        ' . method_field('DELETE') . '
+                        <button type="submit" class="delete btn btn-danger btn-sm">Delete</button>
+                    </form>
+                ';
+
+
 
                     return $btn;
                 })
@@ -59,23 +63,42 @@ class CompanyController extends Controller
      */
     public function store(CreateCompanyRequest $request)
     {
-        // Create a new company instance
-        $company = new Company();
-        $company->name = $request['name'];
-        $company->email = $request['email'];
 
-        // Handle logo upload if provided
-        if ($request->hasFile('logo')) {
-            $logoFile = $request->file('logo');
-            $logoPath = 'assets/logos/' . $logoFile->getClientOriginalName(); // Adjust the storage path and file name as needed
-            $logoStore = $logoFile->storeAs('public/assets/logos', $logoFile->getClientOriginalName()); // Store the file with the original name
-            $company->logo = $logoPath;
+        try {
+            // Validate the incoming request data
+            $validatedData = $request->validated();
+
+            // Create a new company instance
+            $company = new Company();
+            $company->name = $validatedData['name'];
+            $company->email = $validatedData['email'];
+
+            if($request->hasFile('logo')){
+                $image = $request->file('logo');
+                $filename = 'assets/logos/'.time().mt_rand(10,10000).'.'.$image->getClientOriginalExtension();
+                Storage::disk('public')->put($filename, File::get($image));
+                $company->logo = $filename;
+            }
+
+            // Save the company
+            $company->save();
+
+            Mail::to($company->email)->send(new NewCompanyNotification($company));
+
+            notify()->success("Successfully Create Company", "Success", "topRight");
+
+            return redirect()->route('companies.index');
+        } catch (ValidationException $e) {
+            // Redirect back with validation errors
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            notify()->error("Failed to create company", "Error", "topRight");
+            return redirect()->back()->withInput();
         }
-
-        // Save the company
-        $company->save();
-        return redirect()->route('companies.index');
     }
+
+
 
 
     /**
@@ -99,35 +122,59 @@ class CompanyController extends Controller
      */
     public function update(UpdateCompanyRequest $request, Company $company)
     {
-        $company->name = $request->input('name');
-        $company->email = $request->input('email');
+        try {
+            // Validate the incoming request data
+            $validatedData = $request->validated();
 
-        // Handle logo update if provided
-        if ($request->hasFile('logo')) {
-            // Delete the previous logo if exists
-            if ($company->logo) {
-                Storage::delete($company->logo);
+            $company->name = $validatedData['name'];
+            $company->email = $validatedData['email'];
+
+            // Handle logo update if provided and valid
+            if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
+                // Delete the previous logo if exists
+                if ($company->logo) {
+                    Storage::delete($company->logo);
+                }
+
+                $image = $request->file('logo');
+                $filename = 'assets/logos/'.time().mt_rand(10,10000).'.'.$image->getClientOriginalExtension();
+                Storage::disk('public')->put($filename, File::get($image));
+                $company->logo = $filename;
             }
 
-            $logoFile = $request->file('logo');
-            $extension = $logoFile->getClientOriginalExtension();
-            $fileName = 'logo.' . $extension;
-            $logoPath = 'assets/logos/' . $logoFile->getClientOriginalName(); // Adjust the storage path and file name as needed
-            $logoStore = $logoFile->storeAs('public/assets/logos', $fileName);
-            $company->logo = $logoPath;
+            $company->save();
+            notify()->success("Successfully Update Company", "Success", "topRight");
+            return redirect()->route('companies.index');
+        } catch (ValidationException $e) {
+            // Redirect back with validation errors
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            notify()->error("Failed to update company", "Error", "topRight");
+            return redirect()->back()->withInput();
         }
-
-
-        $company->save();
-
-        return redirect()->route('companies.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
+
     public function destroy(Company $company)
     {
-        //
+        try {
+            // Delete the company logo file if it exists
+            if ($company->logo) {
+                Storage::delete($company->logo);
+            }
+
+            // Delete the company from the database
+            $company->delete();
+
+            notify()->success("Successfully deleted company", "Success", "topRight");
+            return redirect()->route('companies.index');
+        } catch (Exception $e) {
+            notify()->error("Failed to delete company", "Error", "topRight");
+            return redirect()->back()->withErrors(["error" => "Failed to delete company"]);
+        }
     }
 }

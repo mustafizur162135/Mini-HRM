@@ -19,7 +19,7 @@
                     <i class="pe-7s-bookmarks icon-gradient bg-mean-fruit">
                     </i>
                 </div>
-                <div>{{ __(isset($company) ? 'multiLang.edit_company' : 'multiLang.create_company') }}</div>
+                <div>{{ __(isset($company) ? 'edit_company' : 'create_company') }}</div>
 
             </div>
             <div class="page-title-actions">
@@ -28,9 +28,9 @@
                         <span class="btn-icon-wrapper pr-2 opacity-7">
                             <i class="fas fa-arrow-circle-left fa-w-20"></i>
                         </span>
-                        {{ __('multiLang.back_to_list') }}
+                        {{ __('back_to_list') }}
                     </a>
-                    
+
                 </div>
             </div>
         </div>
@@ -38,7 +38,7 @@
 
     <div class="row">
         <div class="col-12">
-          
+
             <form role="form" id="companyFrom" method="POST"
                 action="{{ isset($company) ? route('companies.update', $company->id) : route('companies.store') }}"
                 enctype="multipart/form-data">
@@ -53,10 +53,10 @@
                             <div class="form-row">
                                 <div class="col-md-6">
                                     <div class="position-relative form-group">
-                                        <label for="company">{{ __('multiLang.company_name') }} <span
+                                        <label for="company">{{ __('company_name') }} <span
                                                 class="text-danger">*</span></label>
                                         <input value="{{ old('name') ?? ($company->name ?? '') }}" name="name"
-                                            id="name" placeholder="{{ __('multiLang.company_name') }}" type="text"
+                                            id="name" placeholder="{{ __('company_name') }}" type="text"
                                             class="form-control rounded @error('name') is-invalid @enderror">
                                         @error('name')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -65,44 +65,49 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="position-relative form-group">
-                                        <label for="email">{{ __('multiLang.company_email') }}</label>
-                                        <input value="{{ old('email') ?? ($company->email ?? '') }}" name="email" id="email"
-                                            placeholder="{{ __('multiLang.company_email') }}" type="email"
+                                        <label for="email">{{ __('company_email') }}</label>
+                                        <input value="{{ old('email') ?? ($company->email ?? '') }}" name="email"
+                                            id="email" placeholder="{{ __('company_email') }}" type="email"
                                             class="form-control rounded @error('email') is-invalid @enderror">
                                         @error('email')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
-                                
+
                             </div>
                             <div class="form-group">
-                                <label for="logo">{{ __('multiLang.company_logo') }}</label>
+                                <label for="logo">{{ __('company_logo') }}</label>
                                 <input type="file" name="logo" id="logo"
                                     class="dropify form-control-file @error('logo') is-invalid @enderror"
-                                    data-default-file="{{ isset($company) ? Storage::url($company->logo) : '' }}">
+                                    data-default-file="{{ isset($company) ? Storage::url($company->logo) : '' }}"
+                                    data-max-file-size="2M">
                                 @error('logo')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+
+                                <!-- Add a small note for maximum size -->
+                                <small class="form-text text-muted">{{ __('maximum_logo_size') }}</small>
                             </div>
-                            
+
+
 
 
 
                             <button type="button" class="btn-shadow btn btn-danger" onclick="resetForm('companyFrom')">
                                 <i class="fas fa-redo"></i>
-                                Reset
+                                {{ __('reset') }}
                             </button>
 
                             @isset($company)
                                 <button type="submit" class="btn-shadow btn btn-primary ">
                                     <i class="fas fa-arrow-circle-up opacity-7"></i>
-                                    Update
+                                    {{ __('update') }}
                                 </button>
                             @else
                                 <button type="submit" class="btn-shadow btn btn-success">
                                     <i class="fas fa-plus-circle"></i>
-                                    Create
+                                    {{ __('create') }}
                                 </button>
                             @endisset
                         </div>
@@ -126,6 +131,12 @@
             document.getElementById(formId).reset();
         }
 
-        $('.dropify').dropify();
+        $('.dropify').dropify({
+
+
+            // Set the maximum image width and height
+            maxImageWidth: 100,
+            maxImageHeight: 100,
+        });
     </script>
 @endpush

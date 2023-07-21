@@ -83,11 +83,15 @@ return [
     |
     */
 
-    'locales' => [
+    'locale' => 'en',
+
+    'available_locales' => [
         'en' => 'English',
         'bn' => 'Bangla',
     ],
-    
+
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -100,7 +104,7 @@ return [
     |
     */
 
-    'fallback_locale' => 'bn',
+    'fallback_locale' => 'en',
 
     /*
     |--------------------------------------------------------------------------
@@ -164,7 +168,8 @@ return [
          * Package Service Providers...
          */
 
-         Yajra\DataTables\DataTablesServiceProvider::class,
+        Yajra\DataTables\DataTablesServiceProvider::class,
+        LaraIzitoast\LaraIzitoastServiceProvider::class,
 
         /*
          * Application Service Providers...

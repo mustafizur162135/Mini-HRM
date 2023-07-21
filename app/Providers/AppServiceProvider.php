@@ -19,12 +19,12 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot()
     {
-       // Get the preferred language from user preferences or session
-    $preferredLanguage = Session::get('preferred_language', 'bn'); // Assuming the default language is English
+        // Get the preferred language from the session
+        //$preferredLanguage = Session::get('preferred_language', 'bn'); // 
 
-    // Set the preferred language
-    App::setLocale($preferredLanguage);
+        // Set the preferred language
+        // App::setLocale($preferredLanguage);
     }
 }
